@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Data - Hospital & Patient Registry</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/datatables.net-bs5@1.11.5/css/dataTables.bootstrap5.min.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Left-side fixed dashboard -->
+            <div class="col-md-3 col-lg-2 sidebar p-3 bg-light">
+                <h3 class="text-center mb-4">Hospital Registry</h3>
+                <div class="d-grid gap-3">
+                    <a href="{{ url_for('register_hospital') }}" class="btn btn-primary btn-lg">Register Hospital</a>
+                    <a href="{{ url_for('register_patient') }}" class="btn btn-success btn-lg">Register Patient</a>
+                    <a href="{{ url_for('view_data') }}" class="btn btn-info btn-lg active">View Data</a>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary btn-lg">Home</a>
+                </div>
+            </div>
+            
+            <!-- Main content area -->
+            <div class="col-md-9 col-lg-10 main-content p-4">
+                <div id="contentArea">
+                    <h2>View Data</h2>
+                    
+                    {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                    {% endif %}
+                    
+                    <ul class="nav nav-tabs" id="dataTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="patients-tab" data-bs-toggle="tab" data-bs-target="#patients" type="button" role="tab" aria-controls="patients" aria-selected="true">Patients</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="hospitals-tab" data-bs-toggle="tab" data-bs-target="#hospitals" type="button" role="tab" aria-controls="hospitals" aria-selected="false">Hospitals</button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="dataTabsContent">
+                        <!-- Patients Tab -->
+                        <div class="tab-pane fade show active" id="patients" role="tabpanel" aria-labelledby="patients-tab">
+                            <div class="mt-4">
+                                <h3>Patient Records</h3>
+                                
+                                {% if patients and patient_headers %}
+                                <div class="table-responsive mt-3">
+                                    <table id="patientsTable" class="table table-striped table-hover">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                {% for header in patient_headers %}
+                                                <th>{{ header }}</th>
+                                                {% endfor %}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for patient in patients %}
+                                            <tr>
+                                                {% for cell in patient %}
+                                                <td>{{ cell }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="alert alert-info mt-3">No patient records found.</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Hospitals Tab -->
+                        <div class="tab-pane fade" id="hospitals" role="tabpanel" aria-labelledby="hospitals-tab">
+                            <div class="mt-4">
+                                <h3>Hospital Records</h3>
+                                
+                                {% if hospitals and hospital_headers %}
+                                <div class="table-responsive mt-3">
+                                    <table id="hospitalsTable" class="table table-striped table-hover">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                {% for header in hospital_headers %}
+                                                <th>{{ header }}</th>
+                                                {% endfor %}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for hospital in hospitals %}
+                                            <tr>
+                                                {% for cell in hospital %}
+                                                <td>{{ cell }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="alert alert-info mt-3">No hospital records found.</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/datatables.net@1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTables with search, sort, and pagination features
+            $('#patientsTable').DataTable({
+                responsive: true,
+                order: [[0, 'desc']], // Sort by timestamp (first column) in descending order
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]]
+            });
+            
+            $('#hospitalsTable').DataTable({
+                responsive: true,
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]]
+            });
+        });
+    </script>
+</body>
+</html>

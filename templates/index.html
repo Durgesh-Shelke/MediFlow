@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital & Patient Registry</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Left-side fixed dashboard -->
+            <div class="col-md-3 col-lg-2 sidebar p-3 bg-light">
+                <h3 class="text-center mb-4">Hospital Registry</h3>
+                <div class="d-grid gap-3">
+                    <button id="registerHospitalBtn" class="btn btn-primary btn-lg">Register Hospital</button>
+                    <button id="registerPatientBtn" class="btn btn-success btn-lg">Register Patient</button>
+                    <button id="viewDataBtn" class="btn btn-info btn-lg">View Data</button>
+                </div>
+            </div>
+            
+            <!-- Main content area -->
+            <div class="col-md-9 col-lg-10 main-content p-4">
+                <div id="contentArea">
+                    <div class="jumbotron text-center">
+                        <h1>🏥 Hospital & Patient Registry</h1>
+                        <p class="lead">Select an action from the sidebar to get started</p>
+                        <hr class="my-4">
+                        <p>This application allows you to register hospitals, record patient vital signs, and view spatial relationships between hospitals.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

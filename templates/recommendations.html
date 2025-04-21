@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Recommendations</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 20px;
+        }
+        .recommendation-card {
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            transition: transform 0.2s ease;
+        }
+        .recommendation-card:hover {
+            transform: translateY(-5px);
+        }
+        .emergency {
+            border-left: 6px solid #dc3545;
+        }
+        .high-priority {
+            border-left: 6px solid #fd7e14;
+        }
+        .medium-priority {
+            border-left: 6px solid #ffc107;
+        }
+        .low-priority {
+            border-left: 6px solid #28a745;
+        }
+        .hospital-info {
+            font-size: 1.1rem;
+        }
+        .selected-hospital {
+            border: 2px solid #0d6efd;
+            background-color: #f0f7ff;
+        }
+        .current-hospital-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #6c757d;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        .urgency-badge {
+            font-size: 1rem;
+            padding: 8px 12px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        .wait-time {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .delay-info {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        .patient-info {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .select-btn {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <h1 class="text-center mb-4">Hospital Recommendations</h1>
+                
+                <!-- Patient Information -->
+                <div class="patient-info mb-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Patient: {{ patient.Name }}</h4>
+                            <p class="mb-0">Current Location: {{ patient['Hospital name'] }}</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            {% if urgency == "Emergency" %}
+                            <span class="urgency-badge bg-danger text-white">EMERGENCY</span>
+                            {% elif urgency == "High Priority" %}
+                            <span class="urgency-badge bg-warning text-dark">HIGH PRIORITY</span>
+                            {% elif urgency == "Medium Priority" %}
+                            <span class="urgency-badge bg-info text-white">MEDIUM PRIORITY</span>
+                            {% else %}
+                            <span class="urgency-badge bg-success text-white">LOW PRIORITY</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 class="mb-3">Recommended Hospitals</h3>
+                <form action="{{ url_for('generate_token') }}" method="post">
+                    <input type="hidden" name="patient_id" value="{{ patient.Name }}">
+                    <input type="hidden" name="urgency_level" value="{{ urgency }}">
+                    
+                    <div class="row">
+                        {% for hospital in hospitals %}
+                        <div class="col-lg-4">
+                            <div class="card recommendation-card mb-4 
+                                {% if urgency == 'Emergency' %}emergency
+                                {% elif urgency == 'High Priority' %}high-priority
+                                {% elif urgency == 'Medium Priority' %}medium-priority
+                                {% else %}low-priority{% endif %}">
+                                
+                                {% if hospital.IsCurrentHospital %}
+                                <span class="current-hospital-badge">Current Location</span>
+                                {% endif %}
+                                
+                                <div class="card-body">
+                                    <h4 class="card-title">{{ hospital['Hospital Name'] }}</h4>
+                                    <div class="hospital-info">
+                                        <div class="wait-time text-center my-3">
+                                            {{ hospital['Total Delay']|round(1) }} min
+                                            <div class="text-muted small">Total Estimated Delay</div>
+                                        </div>
+                                        
+                                        <div class="delay-info">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="text-muted small">Travel Time</div>
+                                                    <div>{{ hospital['Travel Time']|round(1) }} min</div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="text-muted small">Wait Time</div>
+                                                    <div>{{ hospital['Queue Time']|round(1) }} min</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="text-muted mt-2">
+                                            <small>Distance: {{ hospital['Distance']|round(1) }} units</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <button type="submit" name="selected_hospital" value="{{ hospital['Hospital Name'] }}" 
+                                            class="btn btn-primary select-btn">
+                                        Select This Hospital
+                                    </button>
+                                    
+                                    <input type="hidden" name="hospital_{{ loop.index }}_wait_time" value="{{ hospital['Total Delay'] }}">
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    {% if hospitals|length == 0 %}
+                    <div class="alert alert-warning text-center">
+                        <h4>No Suitable Hospitals Found</h4>
+                        <p>Please contact hospital staff for assistance.</p>
+                    </div>
+                    {% endif %}
+                </form>
+                
+                <div class="text-center mt-3 mb-5">
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary">Go Back</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
